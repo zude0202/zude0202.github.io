@@ -3,27 +3,60 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ page.description | default: site.description }}">
     <title>{{ page.title | default: site.title }}</title>
     <link rel="stylesheet" href="{{ '/assets/main.css' | relative_url }}">
     <style>
-      .site-title { display: none !important; }
-      .site-header { min-height: 0 !important; padding: 10px 0; }
-      .home h1 { display: none !important; }
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+        font-size: 16px;
+        line-height: 1.8;
+        color: #222;
+        background: #fff;
+      }
+      a { color: #1a73e8; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+
+      /* ヘッダー */
+      .site-header {
+        background: #fff;
+        border-bottom: 2px solid #222;
+        padding: 16px 20px;
+      }
+      .site-header .site-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #222;
+        letter-spacing: 0.05em;
+      }
+
+      /* メインコンテンツ */
+      .page-content {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 24px 20px 60px;
+      }
+
+      /* フッター */
+      .site-footer {
+        border-top: 1px solid #ddd;
+        padding: 20px;
+        text-align: center;
+        font-size: 13px;
+        color: #999;
+      }
     </style>
   </head>
   <body>
-    <header class="site-header" role="banner">
-      <div class="wrapper"></div>
+    <header class="site-header">
+      <a class="site-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
     </header>
     <main class="page-content" aria-label="Content">
-      <div class="wrapper">
-        {{ content }}
-      </div>
+      {{ content }}
     </main>
-    <footer class="site-footer h-card">
-      <div class="wrapper">
-        <p>{{ site.title }}</p>
-      </div>
+    <footer class="site-footer">
+      <p>&copy; {{ site.time | date: '%Y' }} {{ site.title }}</p>
     </footer>
   </body>
 </html>
