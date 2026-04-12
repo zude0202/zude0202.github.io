@@ -1,5 +1,12 @@
-title: "ブログタイトル"
-description: "ブログの説明"
+title: "趣味を副業にする方法"
+description: "好きなことでお金を稼ぐための実践ガイド"
 theme: minima
+lang: ja
+
+minima:
+  skin: dark
+
 plugins:
   - jekyll-feed
+
+permalink: /:year/:month/:day/:title/
