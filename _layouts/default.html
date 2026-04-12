@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page.title | default: site.title }}</title>
+    <link rel="stylesheet" href="{{ '/assets/main.css' | relative_url }}">
+    <style>
+      .site-title { display: none !important; }
+      .site-header { min-height: 0 !important; padding: 10px 0; }
+      .home h1 { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <header class="site-header" role="banner">
+      <div class="wrapper"></div>
+    </header>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        {{ content }}
+      </div>
+    </main>
+    <footer class="site-footer h-card">
+      <div class="wrapper">
+        <p>{{ site.title }}</p>
+      </div>
+    </footer>
+  </body>
+</html>
