@@ -10,3 +10,6 @@ defaults:
       type: "posts"
     values:
       layout: "post"
+
+future: true
+timezone: Asia/Tokyo
