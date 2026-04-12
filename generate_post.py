@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 CLAUDE_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 
 AFFILIATE_MAP = {
-    "ホラー映画":       "https://af.moshimo.com/af/c/click?a_id=XXXX&p_id=YYYY",
+    "ホラー映画":       "https://af.moshimo.com/af/c/click?a_id=5483172&p_id=56&pc_id=56&pl_id=637&url=https%3A%2F%2Fbooks.rakuten.co.jp%2Fsearch%3Fsitem%3D%25E3%2583%259B%25E3%2583%25A9%25E3%2583%25BC%25E5%25B0%258F%25E8%25AA%25AC%26g%3D000%26l-id%3Dpc-search-box",
     "アマゾンプライム": "https://af.moshimo.com/af/c/click?a_id=XXXX&p_id=ZZZZ",
     "癒やしグッズ":     "https://af.moshimo.com/af/c/click?a_id=XXXX&p_id=AAAA",
 }
