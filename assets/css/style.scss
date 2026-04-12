@@ -5,9 +5,14 @@
 
 .site-title,
 .site-title:visited {
-  visibility: hidden;
+  display: none !important;
 }
 
-.site-header .wrapper::after {
-  content: none;
+.site-header {
+  min-height: 0;
+}
+
+.site-header .wrapper {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
