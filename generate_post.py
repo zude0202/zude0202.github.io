@@ -1,9 +1,9 @@
 import anthropic
 import os
-import random
 import subprocess
 import json
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
 
 CLAUDE_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 
@@ -67,8 +67,8 @@ def insert_affiliate_links(content: str) -> str:
             content = content.replace(kw, link, 1)
     return content
 
-def save_as_jekyll_post(title: str, content: str, slug: str) -> str:
-    date_str = datetime.now().strftime("%Y-%m-%d")
+def save_as_jekyll_post(title: str, content: str, slug: str, date: datetime) -> str:
+    date_str = date.strftime("%Y-%m-%d")
     filename = f"_posts/{date_str}-{slug}.md"
     front_matter = f"""---
 layout: post
@@ -80,22 +80,41 @@ date: {date_str}
     os.makedirs("_posts", exist_ok=True)
     with open(filename, "w", encoding="utf-8") as f:
         f.write(front_matter + content)
-    print(f"✅ ファイル作成: {filename}")
+    print(f"✅ 作成: {filename}")
     return filename
 
-def git_push(filename: str):
-    subprocess.run(["git", "add", filename], check=True)
-    subprocess.run(["git", "commit", "-m", f"Add post: {filename}"], check=True)
+def git_push_all():
+    subprocess.run(["git", "add", "_posts/"], check=True)
+    subprocess.run(["git", "commit", "-m", "Add 10 posts in bulk"], check=True)
     subprocess.run(["git", "push"], check=True)
-    print("✅ 公開完了")
+    print("✅ 全記事を公開しました")
 
 def main():
-    keyword = random.choice(KEYWORDS)
-    print(f"📝 生成中: {keyword}")
-    article = generate_article(keyword)
-    article["content"] = insert_affiliate_links(article["content"])
-    filename = save_as_jekyll_post(article["title"], article["content"], article["slug"])
-    git_push(filename)
+    filenames = []
+    # 過去10日分の日付に分散して投稿（自然に見せるため）
+    base_date = datetime.now()
+
+    for i, keyword in enumerate(KEYWORDS):
+        print(f"📝 [{i+1}/10] 生成中: {keyword}")
+        try:
+            article = generate_article(keyword)
+            article["content"] = insert_affiliate_links(article["content"])
+            post_date = base_date - timedelta(days=9 - i)
+            filename = save_as_jekyll_post(
+                article["title"],
+                article["content"],
+                article["slug"],
+                post_date
+            )
+            filenames.append(filename)
+            time.sleep(1)  # API負荷軽減
+        except Exception as e:
+            print(f"❌ エラー ({keyword}): {e}")
+            continue
+
+    if filenames:
+        git_push_all()
+        print(f"\n🎉 {len(filenames)}記事を公開しました")
 
 if __name__ == "__main__":
     main()
