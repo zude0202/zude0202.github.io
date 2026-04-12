@@ -1,0 +1,14 @@
+---
+---
+
+@import "minima";
+
+.site-title,
+.site-title:visited {
+  display: none;
+}
+
+.site-header .site-nav {
+  float: left;
+  margin-left: 0;
+}
