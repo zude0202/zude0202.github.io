@@ -5,10 +5,9 @@
 
 .site-title,
 .site-title:visited {
-  display: none;
+  visibility: hidden;
 }
 
-.site-header .site-nav {
-  float: left;
-  margin-left: 0;
+.site-header .wrapper::after {
+  content: none;
 }
