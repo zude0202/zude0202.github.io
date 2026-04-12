@@ -1,0 +1,82 @@
+---
+layout: default
+---
+
+<style>
+  .blog-header {
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eee;
+  }
+  .blog-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 8px;
+  }
+  .blog-header p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+  }
+  .post-list {
+    list-style: none;
+  }
+  .post-item {
+    padding: 20px 0;
+    border-bottom: 1px solid #eee;
+  }
+  .post-item:last-child {
+    border-bottom: none;
+  }
+  .post-date {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 6px;
+  }
+  .post-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #222;
+    line-height: 1.5;
+    margin-bottom: 8px;
+  }
+  .post-title a {
+    color: #222;
+  }
+  .post-title a:hover {
+    color: #1a73e8;
+    text-decoration: none;
+  }
+  .post-excerpt {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.7;
+  }
+  .read-more {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #1a73e8;
+  }
+</style>
+
+<div class="blog-header">
+  <h1>{{ site.title }}</h1>
+  <p>{{ site.description }}</p>
+</div>
+
+<ul class="post-list">
+  {% for post in site.posts %}
+  <li class="post-item">
+    <div class="post-date">{{ post.date | date: "%Y年%-m月%-d日" }}</div>
+    <div class="post-title">
+      <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+    </div>
+    <div class="post-excerpt">
+      {{ post.excerpt | strip_html | truncate: 80 }}
+    </div>
+    <a class="read-more" href="{{ post.url | relative_url }}">続きを読む →</a>
+  </li>
+  {% endfor %}
+</ul>
