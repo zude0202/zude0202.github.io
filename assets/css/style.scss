@@ -8,11 +8,15 @@
   display: none !important;
 }
 
-.site-header {
-  min-height: 0;
+.trigger .page-link:first-child {
+  display: none !important;
 }
 
-.site-header .wrapper {
-  padding-top: 10px;
-  padding-bottom: 10px;
+.home .page-heading,
+.home h1#zude0202githubio {
+  display: none !important;
+}
+
+.site-header {
+  min-height: 0;
 }
