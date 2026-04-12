@@ -9,9 +9,8 @@ from datetime import datetime, timedelta
 CLAUDE_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 
 AFFILIATE_MAP = {
-    "ホラー映画":       "https://af.moshimo.com/af/c/click?a_id=5483172&p_id=56&pc_id=56&pl_id=637&url=https%3A%2F%2Fbooks.rakuten.co.jp%2Fsearch%3Fsitem%3D%25E3%2583%259B%25E3%2583%25A9%25E3%2583%25BC%25E5%25B0%258F%25E8%25AA%25AC%26g%3D000%26l-id%3Dpc-search-box",
+    "ホラー小説":       "https://af.moshimo.com/af/c/click?a_id=5483172&p_id=56&pc_id=56&pl_id=637&url=https%3A%2F%2Fbooks.rakuten.co.jp%2Fsearch%3Fsitem%3D%25E3%2583%259B%25E3%2583%25A9%25E3%2583%25BC%25E5%25B0%258F%25E8%25AA%25AC%26g%3D000%26l-id%3Dpc-search-box",
     "アマゾンプライム": "https://af.moshimo.com/af/c/click?a_id=XXXX&p_id=ZZZZ",
-    "癒やしグッズ":     "https://af.moshimo.com/af/c/click?a_id=XXXX&p_id=AAAA",
 }
 
 KEYWORDS = [
@@ -27,25 +26,22 @@ KEYWORDS = [
     "写真 心霊 自分の後ろ 人影",
     "夢 同じ場所 繰り返す 出口ない",
     "隣人 挨拶 存在しない部屋番号",
-    "ホラー小説"
-    "お風呂　真夜中　足首"
-    "突然　霧　迷い込む"
-    "PC　勝手に　ダウンロード"
-    "水　生き物　汚れる"
+    "お風呂 真夜中 足首",
+    "突然 霧 迷い込む",
+    "PC 勝手に ダウンロード",
+    "水 生き物 汚れる",
 ]
 
-# キーワードに合わせたアフィリ商品の動的選択
 KEYWORD_AFFILIATE_MAP = {
-    "映画": "ホラー映画",
+    "映画": "アマゾンプライム",
     "動画": "アマゾンプライム",
-    "癒": "癒やしグッズ",
 }
 
 def get_affiliate_key(keyword: str) -> str:
     for kw, affiliate_key in KEYWORD_AFFILIATE_MAP.items():
         if kw in keyword:
             return affiliate_key
-    return list(AFFILIATE_MAP.keys())[0]
+    return "ホラー小説"
 
 def parse_json_safely(text: str) -> dict:
     text = text.strip()
@@ -81,19 +77,19 @@ def generate_article(keyword: str) -> dict:
    - 3行ごとに必ず空行を入れる。
    - 余計な修飾語を削り、淡々とした文体で恐怖を際立たせる。
 4. 結末: 明確な解決はせず、読者の想像力に委ねる「後味の悪い終わり方」にしてください。
-5. タイトル冒頭に「【実話】」または「【フォロワー体験談】」をつけてください。
-6. 「{affiliate_key}」を読後の気分転換として、記事末尾に自然な形で1回だけ紹介してください。
+5. 令和を意識して現代の時代背景を大事にする
+6. 句読点をいれすぎない
+7.　怪談話の語り手を意識する
 
 【構成】
-- ## タイトル（一目で「何か嫌な予感がする」もの）
+- ## タイトル
 - 導入（日常シーン・200字程度）
 - 展開（違和感の発生・300字程度）
 - クライマックス（恐怖の核心・300字程度）
 - 結び（不穏な余韻・100字程度）
-- アフィリエイト誘導（読後の気分転換として自然に）
 
 JSON形式のみで出力（解説やタグは一切不要）:
-{{"title": "【実話】心臓に悪いタイトル（32文字以内）", "content": "Markdown本文全体", "slug": "英数字ハイフンのみ20文字以内"}}"""
+{{"title": "思わず後ろを振り返るタイトル（32文字以内）", "content": "Markdown本文全体", "slug": "英数字ハイフンのみ20文字以内"}}"""
         }]
     )
     return parse_json_safely(response.content[0].text)
@@ -103,6 +99,15 @@ def insert_affiliate_links(content: str) -> str:
         if kw in content:
             link = f"[{kw}]({url})"
             content = content.replace(kw, link, 1)
+
+    content += f"""
+
+---
+
+**今夜眠れなくなったあなたへ**
+
+怖さの余韻が残るうちに、[ホラー小説]({AFFILIATE_MAP['ホラー小説']})で続きの恐怖を楽しんでみてください。寝る前には推奨しません。
+"""
     return content
 
 def save_as_jekyll_post(title: str, content: str, slug: str, date: datetime) -> str:
