@@ -2,58 +2,53 @@ import anthropic
 import os
 import subprocess
 import json
-import time
 import re
+import time
 from datetime import datetime, timedelta
 
 CLAUDE_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 
 AFFILIATE_MAP = {
-    "自己肯定感を高める本":   "https://af.moshimo.com/af/c/click?a_id=XXXX&p_id=YYYY",
-    "マインドフルネス瞑想":   "https://af.moshimo.com/af/c/click?a_id=XXXX&p_id=ZZZZ",
-    "ジャーナリングノート":   "https://af.moshimo.com/af/c/click?a_id=XXXX&p_id=AAAA",
-}
-
-# キーワードと相性の良いアフィリ商品を対応させる
-KEYWORD_AFFILIATE_MAP = {
-    "瞑想": "マインドフルネス瞑想",
-    "ジャーナリング": "ジャーナリングノート",
-    "書き方": "ジャーナリングノート",
-    "ノート": "ジャーナリングノート",
+    "ホラー映画":       "https://af.moshimo.com/af/c/click?a_id=XXXX&p_id=YYYY",
+    "アマゾンプライム": "https://af.moshimo.com/af/c/click?a_id=XXXX&p_id=ZZZZ",
+    "癒やしグッズ":     "https://af.moshimo.com/af/c/click?a_id=XXXX&p_id=AAAA",
 }
 
 KEYWORDS = [
-    "自己肯定感 上げる 方法 毎日",
-    "自己肯定感 低い 原因 心理",
-    "マインドフルネス 自己肯定感 瞑想 効果",
-    "ジャーナリング 自己肯定感 書き方",
-    "自己肯定感 スピリチュアル 引き寄せ",
-    "自己肯定感 言葉 アファメーション",
-    "自己肯定感 親 育ち 大人",
-    "自己肯定感 恋愛 パートナー 関係",
-    "自己肯定感 仕事 自信 取り戻す",
-    "自己肯定感 高い人 特徴 習慣",
-    "自己肯定感 本 おすすめ 変わった",
-    "自己肯定感 満月 新月 浄化",
+    "一人暮らし 隙間 視線",
+    "マッチングアプリ 相手 写真 違和感",
+    "深夜のコンビニ 誰もいない 店員",
+    "亡くなった祖母 メッセージ 既読",
+    "スマホ 画面 知らない番号 着信",
+    "引っ越し 前の住人 荷物 残留",
+    "深夜 エレベーター 知らない階",
+    "会社 残業 同僚 気づいたら消えた",
+    "子供 夜泣き 部屋 誰もいない",
+    "写真 心霊 自分の後ろ 人影",
+    "夢 同じ場所 繰り返す 出口ない",
+    "隣人 挨拶 存在しない部屋番号",
 ]
 
+# キーワードに合わせたアフィリ商品の動的選択
+KEYWORD_AFFILIATE_MAP = {
+    "映画": "ホラー映画",
+    "動画": "アマゾンプライム",
+    "癒": "癒やしグッズ",
+}
+
 def get_affiliate_key(keyword: str) -> str:
-    """キーワードに合ったアフィリ商品を動的に選ぶ"""
     for kw, affiliate_key in KEYWORD_AFFILIATE_MAP.items():
         if kw in keyword:
             return affiliate_key
     return list(AFFILIATE_MAP.keys())[0]
 
 def parse_json_safely(text: str) -> dict:
-    """JSONを堅牢にパースする（コードブロック・前後テキストを除去）"""
     text = text.strip()
-    # コードブロック除去
     if text.startswith("```"):
         text = text.split("```")[1]
         if text.startswith("json"):
             text = text[4:]
         text = text.strip()
-    # { } の範囲だけ抽出（前後に余計なテキストがあっても対応）
     match = re.search(r'\{.*\}', text, re.DOTALL)
     if match:
         text = match.group(0)
@@ -68,29 +63,32 @@ def generate_article(keyword: str) -> dict:
         messages=[{
             "role": "user",
             "content": f"""
-あなたは、自己肯定感が低く、SNSや世間の声に流されて疲れ果てている読者を救う「癒やしのカウンセラー」として、以下のブログ記事を執筆してください。
+あなたは、ネット掲示板やSNSで語り継がれるような、現代的でリアリティのある怪談を書くのが得意な「匿名ホラー作家」です。
+キーワードを元に、読者が読み終わったあとに「自分の部屋も怖い」と感じるような、背筋が凍るオリジナル怪談を1話執筆してください。
 
-ブログテーマ: 読むだけで自己肯定感があがる
 キーワード: {keyword}
-ターゲット: SNSの情報に踊らされやすく、自分を責めてしまいがちな繊細な人
-文字数: 1500〜2000字
 
-【執筆の最優先ルール】
-1. 「流されてしまう自分」を武器として定義する: 「周りに敏感なのは、あなたの魂が繊細で美しいセンサーを持っている証拠」といった、短所を長所に反転させる表現を多用してください。
-2. 安心の波を作る: 冒頭で徹底的に読者の疲れに共感し、中盤でスピリチュアルな視点（宇宙のタイミング、魂の浄化、直感の導きなど）を織り交ぜて視点を変えさせ、終盤で「何もしなくていい」という究極の肯定に着地させてください。
-3. アフィリエイトへの自然な誘導: 「{affiliate_key}」を紹介する際は、「頑張って読むもの」ではなく「そばに置いておくだけでお守りになるもの」という文脈で、セクションの終わりに自然に配置してください。
+【執筆の絶対ルール（恐怖を最大化する）】
+1. 「日常」から「異常」への侵食: 始まりはごく普通の日常（仕事帰り、スマホ操作、自室など）から書き出し、徐々に違和感を増大させてください。
+2. 視覚と聴覚の描写: 「ねちゃねちゃとした音」「視界の端に映る白い何か」など、五感を刺激する気味の悪い描写を入れてください。
+3. スマホ最適化:
+   - 一文は30文字〜50文字以内。
+   - 3行ごとに必ず空行を入れる。
+   - 余計な修飾語を削り、淡々とした文体で恐怖を際立たせる。
+4. 結末: 明確な解決はせず、読者の想像力に委ねる「後味の悪い終わり方」にしてください。
+5. タイトル冒頭に「【実話】」または「【フォロワー体験談】」をつけてください。
+6. 「{affiliate_key}」を読後の気分転換として、記事末尾に自然な形で1回だけ紹介してください。
 
 【構成】
-- ## 見出し × 3〜4個（「〜していい理由」「宇宙からのメッセージ」など、心に響く言葉で）
-- 各セクション300〜400字程度（ゆったりとした改行を意識）
-- 最後に「あなたへのメッセージ」セクション（今日からできる、一番小さなアクションを提案）
+- ## タイトル（一目で「何か嫌な予感がする」もの）
+- 導入（日常シーン・200字程度）
+- 展開（違和感の発生・300字程度）
+- クライマックス（恐怖の核心・300字程度）
+- 結び（不穏な余韻・100字程度）
+- アフィリエイト誘導（読後の気分転換として自然に）
 
-【文体】
-- 「〜ですよ」「〜していいんです」という、包み込むようなやわらかい口調
-- 専門用語を避け、体温を感じるような優しい語彙を選択
-
-JSON形式のみで出力（他の文字、解説、コードブロックタグは一切含めない）:
-{{"title": "タイトル（32文字以内、読んだ瞬間に肩の力が抜けるもの）", "content": "Markdown本文全体", "slug": "url用スラッグ(英数字ハイフンのみ、20文字以内)"}}"""
+JSON形式のみで出力（解説やタグは一切不要）:
+{{"title": "【実話】心臓に悪いタイトル（32文字以内）", "content": "Markdown本文全体", "slug": "英数字ハイフンのみ20文字以内"}}"""
         }]
     )
     return parse_json_safely(response.content[0].text)
@@ -109,6 +107,7 @@ def save_as_jekyll_post(title: str, content: str, slug: str, date: datetime) -> 
 layout: post
 title: "{title}"
 date: {date_str}
+categories: horror
 ---
 
 """
@@ -120,7 +119,7 @@ date: {date_str}
 
 def git_push_all():
     subprocess.run(["git", "add", "_posts/"], check=True)
-    subprocess.run(["git", "commit", "-m", "Add posts: self-esteem theme"], check=True)
+    subprocess.run(["git", "commit", "-m", "Add horror posts"], check=True)
     subprocess.run(["git", "push"], check=True)
     print("✅ 全記事を公開しました")
 
