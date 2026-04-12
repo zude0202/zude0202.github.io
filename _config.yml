@@ -1,12 +1,12 @@
 title: "読むと後悔する話"
 description: "寝る前に見るのは推奨いたしません。"
-theme: minima
 lang: ja
-
-minima:
-  skin: dark
-
 plugins:
   - jekyll-feed
-
 permalink: /:year/:month/:day/:title/
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
