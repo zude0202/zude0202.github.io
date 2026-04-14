@@ -148,13 +148,7 @@ categories: horror
         f.write(front_matter + content)
     print(f"✅ 作成: {filename}")
     return filename
-
-def git_push_all():
-    subprocess.run(["git", "add", "_posts/"], check=True)
-    subprocess.run(["git", "commit", "-m", "Add horror posts"], check=True)
-    subprocess.run(["git", "push"], check=True)
-    print("✅ 全記事を公開しました")
-
+    
 def main():
     posted_file = Path("posted_keywords.json")
     if posted_file.exists():
