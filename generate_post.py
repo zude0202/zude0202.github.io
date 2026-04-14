@@ -5,6 +5,7 @@ import json
 import re
 import time
 from datetime import datetime, timedelta
+from pathlib import Path
 
 CLAUDE_API_KEY = os.environ["ANTHROPIC_API_KEY"]
 
@@ -155,30 +156,41 @@ def git_push_all():
     print("✅ 全記事を公開しました")
 
 def main():
-    filenames = []
-    base_date = datetime.now()
+    posted_file = Path("posted_keywords.json")
+    if posted_file.exists():
+        posted = json.loads(posted_file.read_text(encoding="utf-8"))
+    else:
+        posted = []
 
-    for i, keyword in enumerate(KEYWORDS):
-        print(f"📝 [{i+1}/{len(KEYWORDS)}] 生成中: {keyword}")
-        try:
-            article = generate_article(keyword)
-            article["content"] = insert_affiliate_links(article["content"])
-            post_date = base_date - timedelta(days=len(KEYWORDS) - 1 - i)
-            filename = save_as_jekyll_post(
-                article["title"],
-                article["content"],
-                article["slug"],
-                post_date
-            )
-            filenames.append(filename)
-            time.sleep(1)
-        except Exception as e:
-            print(f"❌ エラー ({keyword}): {e}")
-            continue
+    remaining = [k for k in KEYWORDS if k not in posted]
+    if not remaining:
+        print("🔄 全件投稿済み → リセット")
+        posted = []
+        remaining = KEYWORDS
 
-    if filenames:
-        git_push_all()
-        print(f"\n🎉 {len(filenames)}記事を公開しました")
+    keyword = remaining[0]
+    print(f"📝 生成中: {keyword}")
+
+    try:
+        article = generate_article(keyword)
+        article["content"] = insert_affiliate_links(article["content"])
+        filename = save_as_jekyll_post(
+            article["title"],
+            article["content"],
+            article["slug"],
+            datetime.now()
+        )
+        posted.append(keyword)
+        posted_file.write_text(
+            json.dumps(posted, ensure_ascii=False, indent=2),
+            encoding="utf-8"
+        )
+        subprocess.run(["git", "add", "-A"], check=True)
+        subprocess.run(["git", "commit", "-m", f"Add post: {filename}"], check=True)
+        subprocess.run(["git", "push"], check=True)
+        print(f"✅ 公開完了: {filename}")
+    except Exception as e:
+        print(f"❌ エラー: {e}")
 
 if __name__ == "__main__":
     main()
